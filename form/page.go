@@ -7,8 +7,8 @@ type ReqPageFunc interface {
 
 // PageReq 分页请求
 type PageReq struct {
-	Page    int `form:"page" example:"10"`
-	PerPage int `form:"page_size" example:"1"`
+	Page    int `form:"page" json:"page" example:"10"`
+	PerPage int `form:"page_size" json:"page_size" example:"1"`
 }
 
 // GetPage 获取当前页码
