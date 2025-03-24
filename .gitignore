@@ -1,0 +1,42 @@
+# Go构建和二进制文件
+/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go测试和缓存
+*.test
+*.out
+/testdata/
+.cache/
+
+# 依赖管理
+/vendor/
+
+# IDE和编辑器配置
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+.DS_Store
+._*
+
+# 日志和临时文件
+*.log
+*.tmp
+/logs/
+/tmp/
+
+# 环境变量文件
+.env
+.env.local
+
+# 构建目录
+/build/
+/dist/
+
+# 其他自动生成的文件
+/coverage.txt
+/profile.out
