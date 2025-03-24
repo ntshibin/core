@@ -10,6 +10,11 @@ MODULE_NAME = github.com/ntshibin/core
 VERSION = v0.1.0
 TARGET = ./bin/
 
+# 版本号管理
+GET_VERSION = $(shell git describe --tags --abbrev=0 2>/dev/null || echo $(VERSION))
+NEXT_VERSION = $(shell echo $(GET_VERSION) | awk -F. '{ printf "v%d.%d.%d", $$1, $$2, $$3+1 }')
+
+
 # 模块列表
 MODULES = gerror glog gconf gcache ghttp
 
@@ -101,9 +106,17 @@ push:
 .PHONY: tag
 tag:
 	@echo "$(BLUE)创建Git标签...$(NC)"
-	@read -p "标签版本(例如 v0.1.0): " version; \
-	git tag -a $$version -m "Release $$version"; \
-	echo "$(GREEN)标签创建完成.$(NC)"
+	@echo "当前版本: $(GET_VERSION)"
+	@echo "下一版本: $(NEXT_VERSION)"
+	@read -p "是否使用建议的版本号 $(NEXT_VERSION)? [Y/n] " confirm; \
+	if [ "$$confirm" = "" ] || [ "$$confirm" = "Y" ] || [ "$$confirm" = "y" ]; then \
+		git tag -a $(NEXT_VERSION) -m "Release $(NEXT_VERSION)"; \
+		echo "$(GREEN)已创建标签 $(NEXT_VERSION)$(NC)"; \
+	else \
+		read -p "请输入版本号(例如 v0.1.0): " version; \
+		git tag -a $$version -m "Release $$version"; \
+		echo "$(GREEN)已创建标签 $$version$(NC)"; \
+	fi
 
 # 推送Git标签
 .PHONY: push-tag
@@ -116,6 +129,13 @@ push-tag:
 .PHONY: release
 release: all commit tag push push-tag
 	@echo "$(GREEN)发布流程完成.$(NC)"
+
+# 显示版本信息
+.PHONY: version
+version:
+	@echo "$(BLUE)版本信息:$(NC)"
+	@echo "当前版本: $(GET_VERSION)"
+	@echo "下一版本: $(NEXT_VERSION)"
 
 # 帮助信息
 .PHONY: help
@@ -133,4 +153,4 @@ help:
 	@echo "  $(GREEN)tag$(NC) - 创建Git标签"
 	@echo "  $(GREEN)push-tag$(NC) - 推送Git标签"
 	@echo "  $(GREEN)release$(NC) - 执行完整发布流程"
-	@echo "单独构建模块: $(GREEN)$(MODULES)$(NC)" 
+	@echo "单独构建模块: $(GREEN)$(MODULES)$(NC)"

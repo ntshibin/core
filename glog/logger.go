@@ -17,6 +17,7 @@ type Logger struct {
 	*logrus.Logger
 	chain        *handlers.Chain
 	asyncHandler handlers.Handler // 用于存储异步处理器的引用，以便在关闭时调用Close()
+	zapHandler   handlers.Handler // 用于存储zap处理器的引用，以便在关闭时调用Close()
 }
 
 var (
@@ -258,9 +259,21 @@ func (l *Logger) AddHandler(handler handlers.Handler) {
 // Close gracefully shuts down the logger and its handlers.
 // It ensures that all pending log entries are processed before returning.
 func (l *Logger) Close() error {
+	// 关闭异步处理器
 	if l.asyncHandler != nil {
 		if closer, ok := l.asyncHandler.(io.Closer); ok {
-			return closer.Close()
+			if err := closer.Close(); err != nil {
+				return fmt.Errorf("failed to close async handler: %v", err)
+			}
+		}
+	}
+
+	// 关闭zap处理器
+	if l.zapHandler != nil {
+		if closer, ok := l.zapHandler.(io.Closer); ok {
+			if err := closer.Close(); err != nil {
+				return fmt.Errorf("failed to close zap handler: %v", err)
+			}
 		}
 	}
 	return nil

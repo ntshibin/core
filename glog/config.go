@@ -3,6 +3,7 @@
 package glog
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -58,6 +59,12 @@ type Config struct {
 
 	// AsyncConfig contains configuration for asynchronous logging
 	AsyncConfig *AsyncConfig `json:"async_config" yaml:"async_config"`
+
+	// EnableZap enables zap logger
+	EnableZap bool `json:"enable_zap" yaml:"enable_zap" env:"LOG_ENABLE_ZAP" default:"false"`
+
+	// ZapConfig contains configuration for zap logger
+	ZapConfig *handlers.ZapConfig `json:"zap_config" yaml:"zap_config"`
 }
 
 // FileConfig contains settings for file-based logging.
@@ -191,6 +198,19 @@ func ApplyConfig(logger *Logger, config *Config) error {
 	}
 	logger.SetOutput(output)
 
+	// 初始化处理器链
+	chain := handlers.NewChain()
+
+	// 添加zap处理器
+	if config.EnableZap {
+		zapHandler, err := handlers.NewZapHandler(config.ZapConfig)
+		if err != nil {
+			return fmt.Errorf("failed to create zap handler: %v", err)
+		}
+		chain.Add(zapHandler)
+		logger.zapHandler = zapHandler
+	}
+
 	// 设置默认格式化器
 	if config.Format == FormatJSON {
 		logger.SetFormatter(&logrus.JSONFormatter{
@@ -206,9 +226,6 @@ func ApplyConfig(logger *Logger, config *Config) error {
 
 	// Set caller reporting
 	logger.SetReportCaller(config.ReportCaller)
-
-	// Create a new handler chain
-	chain := handlers.NewChain()
 
 	// Add level handler to control log level
 	chain.Add(handlers.NewLevelHandler(config.Level))
