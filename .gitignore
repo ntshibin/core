@@ -1,0 +1,46 @@
+# IDE 相关文件
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 操作系统相关文件
+.DS_Store
+Thumbs.db
+
+# Go 相关文件
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.prof
+*.trace
+*.cover
+*.log
+
+# 依赖目录
+vendor/
+
+# 临时文件
+tmp/
+temp/
+
+# 构建输出
+dist/
+build/
+bin/
+
+# 环境文件
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+*.log
+logs/
+
+# 缓存文件
+.cache/ 
