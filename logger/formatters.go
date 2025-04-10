@@ -26,6 +26,11 @@ func (f *JSONFormatter) Format(event LogEvent) ([]byte, error) {
 	data["message"] = event.Message
 	data["pid"] = os.Getpid() // 添加进程ID
 
+	// 添加日志记录器名称
+	if event.Logger != "" {
+		data["logger"] = event.Logger
+	}
+
 	// 添加调用者信息
 	if event.Caller != "" {
 		data["caller"] = event.Caller
@@ -81,7 +86,12 @@ func (f *TextFormatter) Format(event LogEvent) ([]byte, error) {
 	pid := os.Getpid() // 获取进程ID
 
 	var builder strings.Builder
-	builder.WriteString(fmt.Sprintf("[%s] [%s] [pid:%d] %s", timeStr, levelStr, pid, event.Message))
+
+	if event.Logger != "" {
+		builder.WriteString(fmt.Sprintf("[%s] [%s] [%s] [pid:%d] %s", timeStr, levelStr, event.Logger, pid, event.Message))
+	} else {
+		builder.WriteString(fmt.Sprintf("[%s] [%s] [pid:%d] %s", timeStr, levelStr, pid, event.Message))
+	}
 
 	// 添加调用者信息
 	if event.Caller != "" {

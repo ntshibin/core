@@ -113,6 +113,7 @@ func (l *StandardLogger) log(level LogLevel, msg string) {
 		Message: msg,
 		Fields:  make(map[string]interface{}),
 		Context: l.context,
+		Logger:  l.name,
 	}
 
 	// 复制字段
